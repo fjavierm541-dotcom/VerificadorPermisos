@@ -8,7 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
@@ -17,53 +17,40 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.munidanli.verificadorpermisos.screens.ManualSearchScreen
 import com.munidanli.verificadorpermisos.ui.theme.VerificadorPermisosTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             VerificadorPermisosTheme {
-                PantallaInicio()
+                var pantallaActual by remember { mutableStateOf("inicio") }
+
+                when (pantallaActual) {
+                    "inicio" -> PantallaInicio(
+                        irABusquedaManual = {
+                            pantallaActual = "manual"
+                        }
+                    )
+
+                    "manual" -> ManualSearchScreen(
+                        volverInicio = {
+                            pantallaActual = "inicio"
+                        }
+                    )
+                }
             }
         }
     }
 }
 
 @Composable
-fun PantallaInicio() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFF071A2F),
-                        Color(0xFF0F3B6D),
-                        Color(0xFF1E5A96)
-                    )
-                )
-            )
-    ) {
-
-        // Luces decorativas suaves
-        Box(
-            modifier = Modifier
-                .size(220.dp)
-                .offset(x = (-60).dp, y = 40.dp)
-                .blur(70.dp)
-                .background(Color(0xFF5EC8FF).copy(alpha = 0.35f), RoundedCornerShape(120.dp))
-        )
-
-        Box(
-            modifier = Modifier
-                .size(260.dp)
-                .align(Alignment.BottomEnd)
-                .offset(x = 80.dp, y = 80.dp)
-                .blur(80.dp)
-                .background(Color(0xFF2563EB).copy(alpha = 0.35f), RoundedCornerShape(140.dp))
-        )
-
+fun PantallaInicio(
+    irABusquedaManual: () -> Unit
+) {
+    FondoGlass {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -104,10 +91,54 @@ fun PantallaInicio() {
                 title = "Búsqueda manual",
                 subtitle = "Ingresar datos del permiso",
                 onClick = {
-                    // Aquí irá la pantalla de búsqueda manual
+                    irABusquedaManual()
                 }
             )
         }
+    }
+}
+
+@Composable
+fun FondoGlass(
+    contenido: @Composable BoxScope.() -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFF071A2F),
+                        Color(0xFF0F3B6D),
+                        Color(0xFF1E5A96)
+                    )
+                )
+            )
+    ) {
+        Box(
+            modifier = Modifier
+                .size(220.dp)
+                .offset(x = (-60).dp, y = 40.dp)
+                .blur(70.dp)
+                .background(
+                    Color(0xFF5EC8FF).copy(alpha = 0.35f),
+                    RoundedCornerShape(120.dp)
+                )
+        )
+
+        Box(
+            modifier = Modifier
+                .size(260.dp)
+                .align(Alignment.BottomEnd)
+                .offset(x = 80.dp, y = 80.dp)
+                .blur(80.dp)
+                .background(
+                    Color(0xFF2563EB).copy(alpha = 0.35f),
+                    RoundedCornerShape(140.dp)
+                )
+        )
+
+        contenido()
     }
 }
 
